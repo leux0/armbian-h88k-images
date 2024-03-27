@@ -1,4 +1,4 @@
-# Armbian images for H88K
+# Armbian images for H88K_V3
 [![image_build](https://github.com/leux0/armbian-h88k-images/workflows/Build/badge.svg)](https://github.com/leux0/armbian-h88k-images/actions/workflows/build.yml)
 
 项目初始来自 [Amazingfate](https://github.com/amazingfate/armbian-h88k-images) ，由 [leux0](https://github.com/leux0/armbian-h88k-images) 修改优化
@@ -14,5 +14,7 @@
 
 Download: https://github.com/leux0/armbian-h88k-images/releases/latest
 
+---
 克隆本项目的话，需要在克隆后的仓库设置中调整【Actions】的【工作流权限】为【读取和写入权限】
+
 【Settings】->【Actions】->【General】->【Workflow permissions】->【Read and write permissions】

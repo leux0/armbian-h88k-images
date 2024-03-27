@@ -40,7 +40,8 @@ runs:
           echo "desktop-environment=gnome" >> $GITHUB_ENV
           echo "desktop-environment-config-name=config_base" >> $GITHUB_ENV
           echo "expert=no" >> $GITHUB_ENV
-          echo "desktop_appgroups_selected=\"3dsupport rockchip-multimedia panfork-mesa chromium-browser vim-tiny\"" >> $GITHUB_ENV
+          echo "desktop_appgroups_selected=\"3dsupport rockchip-multimedia panfork-mesa\"" >> $GITHUB_ENV
+          echo "package_list_additional=\"$PACKAGE_LIST_ADDITIONAL chromium vim-tiny\"" >> $GITHUB_ENV
         elif [ ${{ inputs.flavor }} == "cli" ]
         then
           echo "release=bookworm" >> $GITHUB_ENV
@@ -49,7 +50,8 @@ runs:
           echo "desktop-environment=no" >> $GITHUB_ENV
           echo "desktop-environment-config-name=config_base" >> $GITHUB_ENV
           echo "expert=yes" >> $GITHUB_ENV
-          echo "desktop_appgroups_selected=\"rockchip-multimedia panfork-mesa vim-tiny\"" >> $GITHUB_ENV
+          echo "desktop_appgroups_selected=\"rockchip-multimedia panfork-mesa\"" >> $GITHUB_ENV
+          echo "package_list_additional=\"$PACKAGE_LIST_ADDITIONAL vim-tiny\"" >> $GITHUB_ENV
         fi
     - name: Build
       shell: bash
@@ -96,6 +98,7 @@ runs:
             DESKTOP_ENVIRONMENT=${{ env.desktop-environment }} \
             DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ env.desktop-environment-config-name }} \
             DESKTOP_APPGROUPS_SELECTED=${{ env.desktop_appgroups_selected }} \
+            PACKAGE_LIST_ADDITIONAL=${{ env.package_list_additional }} \
             EXPERT=${{ env.expert }} \
             BOARD_FIRMWARE_INSTALL="-full" \
             SHARE_LOG=yes \
