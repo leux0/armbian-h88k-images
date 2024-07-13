@@ -1,0 +1,309 @@
+diff -uprN a/drivers/usb/gadget/legacy/hid.c b/drivers/usb/gadget/legacy/hid.c
+--- a/drivers/usb/gadget/legacy/hid.c
++++ b/drivers/usb/gadget/legacy/hid.c
+@@ -15,15 +15,15 @@
+ #include <linux/usb/composite.h>
+ #include <linux/usb/g_hid.h>
+ 
+-#define DRIVER_DESC		"HID Gadget"
++#define DRIVER_DESC		"Logitech USB Receiver"		// PRODUCT_IDX
+ #define DRIVER_VERSION		"2010/03/16"
+ 
+ #include "u_hid.h"
+ 
+ /*-------------------------------------------------------------------------*/
+ 
+-#define HIDG_VENDOR_NUM		0x0525	/* XXX NetChip */
+-#define HIDG_PRODUCT_NUM	0xa4ac	/* Linux-USB HID gadget */
++#define HIDG_VENDOR_NUM		0x046d	/* idVendor */
++#define HIDG_PRODUCT_NUM	0xc53f	/* idProduct */
+ 
+ /*-------------------------------------------------------------------------*/
+ 
+@@ -67,7 +67,7 @@ static const struct usb_descriptor_heade
+ 
+ /* string IDs are assigned dynamically */
+ static struct usb_string strings_dev[] = {
+-	[USB_GADGET_MANUFACTURER_IDX].s = "",
++	[USB_GADGET_MANUFACTURER_IDX].s = "Logitech",
+ 	[USB_GADGET_PRODUCT_IDX].s = DRIVER_DESC,
+ 	[USB_GADGET_SERIAL_IDX].s = "",
+ 	{  } /* end of list */
+@@ -254,6 +254,107 @@ static int hidg_plat_driver_remove(struc
+ 
+ /****************************** Some noise ******************************/
+ 
++// 防止移除模块时报找不到release函数的错误
++static void release_hid_dev(struct device *dev) {}
++
++// 添加键盘报告描述符
++static struct hidg_func_descriptor keyboard_report_data = {
++	.subclass			= 0,	/* No subclass */
++	.protocol			= 1,	/* 1 Keyboard */ /* 2 Mouse*/ 
++	.report_length		= 8,
++	.report_desc_length	= 63,
++	.report_desc		= {
++		0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
++		0x09, 0x06,                    // USAGE (Keyboard)
++		0xa1, 0x01,                    // COLLECTION (Application)
++		0x05, 0x07,                    //   USAGE_PAGE (Keyboard)
++		0x19, 0xe0,                    //   USAGE_MINIMUM (Keyboard LeftControl)
++		0x29, 0xe7,                    //   USAGE_MAXIMUM (Keyboard Right GUI)
++		0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
++		0x25, 0x01,                    //   LOGICAL_MAXIMUM (1)
++		0x75, 0x01,                    //   REPORT_SIZE (1)
++		0x95, 0x08,                    //   REPORT_COUNT (8)
++		0x81, 0x02,                    //   INPUT (Data,Var,Abs)
++		0x95, 0x01,                    //   REPORT_COUNT (1)
++		0x75, 0x08,                    //   REPORT_SIZE (8)
++		0x81, 0x03,                    //   INPUT (Cnst,Var,Abs)
++		0x95, 0x05,                    //   REPORT_COUNT (5)
++		0x75, 0x01,                    //   REPORT_SIZE (1)
++		0x05, 0x08,                    //   USAGE_PAGE (LEDs)
++		0x19, 0x01,                    //   USAGE_MINIMUM (Num Lock)
++		0x29, 0x05,                    //   USAGE_MAXIMUM (Kana)
++		0x91, 0x02,                    //   OUTPUT (Data,Var,Abs)
++		0x95, 0x01,                    //   REPORT_COUNT (1)
++		0x75, 0x03,                    //   REPORT_SIZE (3)
++		0x91, 0x03,                    //   OUTPUT (Cnst,Var,Abs)
++		0x95, 0x06,                    //   REPORT_COUNT (6)
++		0x75, 0x08,                    //   REPORT_SIZE (8)
++		0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
++		0x25, 0x65,                    //   LOGICAL_MAXIMUM (101)
++		0x05, 0x07,                    //   USAGE_PAGE (Keyboard)
++		0x19, 0x00,                    //   USAGE_MINIMUM (Reserved (no event indicated))
++		0x29, 0x65,                    //   USAGE_MAXIMUM (Keyboard Application)
++		0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
++		0xc0                           // END_COLLECTION
++	}
++};
++
++// 定义键盘设备
++static struct platform_device keyboard_device = {
++	.name				= "hidg",
++	.id					= 0,
++	.num_resources		= 0,
++	.resource			= 0,
++	.dev.platform_data	= &keyboard_report_data,
++	.dev.release 		= &release_hid_dev,
++};
++
++// 添加鼠标报告描述符
++static struct hidg_func_descriptor mouse_report_data = {
++	.subclass			= 1,	/* No subclass */
++	.protocol			= 2,	/* 1 Keyboard */ /* 2 Mouse*/ 
++	.report_length		= 4,
++	.report_desc_length	= 52,
++	.report_desc		= {
++		0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
++		0x09, 0x02,                    // USAGE (Mouse)
++		0xa1, 0x01,                    // COLLECTION (Application)
++		0x09, 0x01,                    //   USAGE (Pointer)
++		0xa1, 0x00,                    //   COLLECTION (Physical)
++		0x05, 0x09,                    //     USAGE_PAGE (Button)
++		0x19, 0x01,                    //     USAGE_MINIMUM (Button 1)
++		0x29, 0x03,                    //     USAGE_MAXIMUM (Button 3)
++		0x15, 0x00,                    //     LOGICAL_MINIMUM (0)
++		0x25, 0x01,                    //     LOGICAL_MAXIMUM (1)
++		0x95, 0x03,                    //     REPORT_COUNT (3)
++		0x75, 0x01,                    //     REPORT_SIZE (1)
++		0x81, 0x02,                    //     INPUT (Data,Var,Abs)
++		0x95, 0x01,                    //     REPORT_COUNT (1)
++		0x75, 0x05,                    //     REPORT_SIZE (5)
++		0x81, 0x03,                    //     INPUT (Cnst,Var,Abs)
++		0x05, 0x01,                    //     USAGE_PAGE (Generic Desktop)
++		0x09, 0x30,                    //     USAGE (X)
++		0x09, 0x31,                    //     USAGE (Y)
++		0x09, 0x38,                    //     USAGE (Wheel)
++		0x15, 0x81,                    //     LOGICAL_MINIMUM (-127)
++		0x25, 0x7f,                    //     LOGICAL_MAXIMUM (127)
++		0x75, 0x08,                    //     REPORT_SIZE (8)
++		0x95, 0x03,                    //     REPORT_COUNT (3)
++		0x81, 0x06,                    //     INPUT (Data,Var,Rel)
++		0xc0,                          //   END_COLLECTION
++		0xc0                           // END_COLLECTION
++	}
++};
++
++// 定义鼠标设备
++static struct platform_device mouse_device = {  
++	.name				= "hidg",
++	.id					= 1,
++	.num_resources		= 0,
++	.resource			= 0,
++	.dev.platform_data	= &mouse_report_data,
++	.dev.release 		= &release_hid_dev,
++};
+ 
+ static struct usb_composite_driver hidg_driver = {
+ 	.name		= "g_hid",
+@@ -267,7 +368,7 @@ static struct usb_composite_driver hidg_
+ static struct platform_driver hidg_plat_driver = {
+ 	.remove		= hidg_plat_driver_remove,
+ 	.driver		= {
+-		.name	= "hidg",
++	.name		= "hidg",
+ 	},
+ };
+ 
+@@ -280,6 +381,22 @@ static int __init hidg_init(void)
+ {
+ 	int status;
+ 
++	// 申请注册键盘设备
++	status = platform_device_register(&keyboard_device);
++	if (status < 0) {
++		printk("Failed: Gadget HID Keyboard Device Register Failed!\n");
++		platform_device_unregister(&keyboard_device);
++		return status;
++	}
++
++	// 申请注册鼠标设备
++	status = platform_device_register(&mouse_device);
++	if (status < 0) {
++		printk("Failed: Gadget HID Mouse Device Register Failed!\n");
++		platform_device_unregister(&mouse_device);
++		return status;
++	}
++
+ 	status = platform_driver_probe(&hidg_plat_driver,
+ 				hidg_plat_driver_probe);
+ 	if (status < 0)
+@@ -297,5 +414,7 @@ static void __exit hidg_cleanup(void)
+ {
+ 	usb_composite_unregister(&hidg_driver);
+ 	platform_driver_unregister(&hidg_plat_driver);
++	platform_device_unregister(&keyboard_device);	// 销毁释放键鼠设备
++	platform_device_unregister(&mouse_device);
+ }
+ module_exit(hidg_cleanup);
+diff -uprN a/backports/drivers/net/wireless/mediatek/mt76/mt7915/eeprom.c b/backports/drivers/net/wireless/mediatek/mt76/mt7915/eeprom.c
+--- a/backports/drivers/net/wireless/mediatek/mt76/mt7915/eeprom.c
++++ b/backports/drivers/net/wireless/mediatek/mt76/mt7915/eeprom.c
+@@ -33,11 +33,14 @@ static int mt7915_check_eeprom(struct mt
+ 	u8 *eeprom = dev->mt76.eeprom.data;
+ 	u16 val = get_unaligned_le16(eeprom);
+ 
++#define CHECK_EEPROM_ERR(match)	(match ? 0 : -EINVAL)
+ 	switch (val) {
+ 	case 0x7915:
++		return CHECK_EEPROM_ERR(is_mt7915(&dev->mt76));
+ 	case 0x7916:
++		return CHECK_EEPROM_ERR(is_mt7916(&dev->mt76));
+ 	case 0x7986:
+-		return 0;
++		return CHECK_EEPROM_ERR(is_mt7986(&dev->mt76));
+ 	default:
+ 		return -EINVAL;
+ 	}
+@@ -136,29 +139,36 @@ static void mt7915_eeprom_parse_band_con
+ {
+ 	struct mt7915_dev *dev = phy->dev;
+ 	u8 *eeprom = dev->mt76.eeprom.data;
++	u8 band = phy->mt76->band_idx;
+ 	u32 val;
+ 
+-	val = eeprom[MT_EE_WIFI_CONF + phy->band_idx];
++	val = eeprom[MT_EE_WIFI_CONF + band];
+ 	val = FIELD_GET(MT_EE_WIFI_CONF0_BAND_SEL, val);
+ 
+ 	if (!is_mt7915(&dev->mt76)) {
+ 		switch (val) {
+ 		case MT_EE_V2_BAND_SEL_5GHZ:
++		case MT_EE_V2_BAND_SEL_5GHZ_6GHZ:
+ 			phy->mt76->cap.has_5ghz = true;
++
++			if (val == MT_EE_V2_BAND_SEL_5GHZ_6GHZ) {
++				u8p_replace_bits(&eeprom[MT_EE_WIFI_CONF + band],
++						 MT_EE_V2_BAND_SEL_5GHZ,
++						 MT_EE_WIFI_CONF0_BAND_SEL);
++
++				/* force to buffer mode */
++				dev->flash_mode = true;
++			}
+ 			return;
+ 		case MT_EE_V2_BAND_SEL_6GHZ:
+ 			phy->mt76->cap.has_6ghz = true;
+ 			return;
+-		case MT_EE_V2_BAND_SEL_5GHZ_6GHZ:
+-			phy->mt76->cap.has_5ghz = true;
+-			phy->mt76->cap.has_6ghz = true;
+-			return;
+ 		default:
+ 			phy->mt76->cap.has_2ghz = true;
+ 			return;
+ 		}
+ 	} else if (val == MT_EE_BAND_SEL_DEFAULT && dev->dbdc_support) {
+-		val = phy->band_idx ? MT_EE_BAND_SEL_5GHZ : MT_EE_BAND_SEL_2GHZ;
++		val = band ? MT_EE_BAND_SEL_5GHZ : MT_EE_BAND_SEL_2GHZ;
+ 	}
+ 
+ 	switch (val) {
+@@ -180,6 +190,7 @@ void mt7915_eeprom_parse_hw_cap(struct m
+ {
+ 	u8 path, nss, nss_max = 4, *eeprom = dev->mt76.eeprom.data;
+ 	struct mt76_phy *mphy = phy->mt76;
++	u8 band = phy->mt76->band_idx;
+ 
+ 	mt7915_eeprom_parse_band_config(phy);
+ 
+@@ -189,7 +200,7 @@ void mt7915_eeprom_parse_hw_cap(struct m
+ 				 eeprom[MT_EE_WIFI_CONF]);
+ 	} else {
+ 		path = FIELD_GET(MT_EE_WIFI_CONF0_TX_PATH,
+-				 eeprom[MT_EE_WIFI_CONF + phy->band_idx]);
++				 eeprom[MT_EE_WIFI_CONF + band]);
+ 	}
+ 
+ 	if (!path || path > 4)
+@@ -202,12 +213,12 @@ void mt7915_eeprom_parse_hw_cap(struct m
+ 			path = min_t(u8, path, 2);
+ 			nss = FIELD_GET(MT_EE_WIFI_CONF3_TX_PATH_B0,
+ 					eeprom[MT_EE_WIFI_CONF + 3]);
+-			if (phy->band_idx)
++			if (band)
+ 				nss = FIELD_GET(MT_EE_WIFI_CONF3_TX_PATH_B1,
+ 						eeprom[MT_EE_WIFI_CONF + 3]);
+ 		} else {
+ 			nss = FIELD_GET(MT_EE_WIFI_CONF_STREAM_NUM,
+-					eeprom[MT_EE_WIFI_CONF + 2 + phy->band_idx]);
++					eeprom[MT_EE_WIFI_CONF + 2 + band]);
+ 		}
+ 
+ 		if (!is_mt7986(&dev->mt76))
+@@ -219,7 +230,7 @@ void mt7915_eeprom_parse_hw_cap(struct m
+ 	nss = min_t(u8, min_t(u8, nss_max, nss), path);
+ 
+ 	mphy->chainmask = BIT(path) - 1;
+-	if (phy->band_idx)
++	if (band)
+ 		mphy->chainmask <<= dev->chainshift;
+ 	mphy->antenna_mask = BIT(nss) - 1;
+ 	dev->chainmask |= mphy->chainmask;
+@@ -342,4 +353,4 @@ const u8 mt7915_sku_group_len[] = {
+ 	[SKU_HE_RU484] = 12,
+ 	[SKU_HE_RU996] = 12,
+ 	[SKU_HE_RU2x996] = 12
+-};
++};
+\ No newline at end of file
+diff -uprN a/backports/drivers/net/wireless/mediatek/mt76/mt7915/init.c b/backports/drivers/net/wireless/mediatek/mt76/mt7915/init.c
+--- a/backports/drivers/net/wireless/mediatek/mt76/mt7915/init.c
++++ b/backports/drivers/net/wireless/mediatek/mt76/mt7915/init.c
+@@ -1109,14 +1109,14 @@ int mt7915_register_device(struct mt7915
+ 	if (ret)
+ 		goto unreg_dev;
+ 
+-	ieee80211_queue_work(mt76_hw(dev), &dev->init_work);
+-
+ 	if (phy2) {
+ 		ret = mt7915_register_ext_phy(dev, phy2);
+ 		if (ret)
+ 			goto unreg_thermal;
+ 	}
+ 
++	ieee80211_queue_work(mt76_hw(dev), &dev->init_work);
++
+ 	mt7915_init_debugfs(&dev->phy);
+ 
+ 	return 0;
