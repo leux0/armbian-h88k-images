@@ -40,7 +40,7 @@ runs:
           echo "desktop-environment=gnome" >> $GITHUB_ENV
           echo "desktop-environment-config-name=config_base" >> $GITHUB_ENV
           echo "expert=no" >> $GITHUB_ENV
-          echo "desktop_appgroups_selected=\"3dsupport rockchip-multimedia panfork-mesa\"" >> $GITHUB_ENV
+          echo "desktop_appgroups_selected=\"3dsupport panfork-mesa\"" >> $GITHUB_ENV
           echo "package_list_board=\"chromium vim-tiny\"" >> $GITHUB_ENV
         elif [ ${{ inputs.flavor }} == "cli" ]
         then
