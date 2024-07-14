@@ -35,7 +35,7 @@ jobs:
       matrix:
         BOARD: [hinlink-h88k]
         DISTRO: [armbian]
-        FLAVOR: [desktop, cli]
+        FLAVOR: [desktop, server]
         BRANCH: [legacy]
     steps:
       - name: Checkout
