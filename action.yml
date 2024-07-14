@@ -34,7 +34,7 @@ runs:
       run: |
         if [ ${{ inputs.flavor }} == "desktop" ]
         then
-          echo "release=bookworm" >> $GITHUB_ENV
+          echo "release=trixie" >> $GITHUB_ENV
           echo "build-minimal=no" >> $GITHUB_ENV
           echo "build-desktop=yes" >> $GITHUB_ENV
           echo "desktop-environment=gnome" >> $GITHUB_ENV
@@ -44,7 +44,7 @@ runs:
           echo "package_list_board=\"chromium vim-tiny\"" >> $GITHUB_ENV
         elif [ ${{ inputs.flavor }} == "cli" ]
         then
-          echo "release=bookworm" >> $GITHUB_ENV
+          echo "release=trixie" >> $GITHUB_ENV
           echo "build-minimal=no" >> $GITHUB_ENV
           echo "build-desktop=no" >> $GITHUB_ENV
           echo "desktop-environment=no" >> $GITHUB_ENV
