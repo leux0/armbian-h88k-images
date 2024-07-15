@@ -42,13 +42,13 @@ runs:
           echo "desktop_appgroups_selected=\"3dsupport rockchip-multimedia panfork-mesa\"" >> $GITHUB_ENV
           echo "package_list_board=\"chromium vim-tiny\"" >> $GITHUB_ENV
         elif [ ${{ inputs.flavor }} == "server" ];then
-          echo "release=jammy" >> $GITHUB_ENV
-          echo "build-minimal=no" >> $GITHUB_ENV
+          echo "release=bookworm" >> $GITHUB_ENV
+          echo "build-minimal=yes" >> $GITHUB_ENV
           echo "build-desktop=no" >> $GITHUB_ENV
           echo "desktop-environment=no" >> $GITHUB_ENV
           echo "desktop-environment-config-name=config_base" >> $GITHUB_ENV
-          echo "expert=yes" >> $GITHUB_ENV
-          echo "desktop_appgroups_selected=\"rockchip-multimedia panfork-mesa\"" >> $GITHUB_ENV
+          echo "expert=no" >> $GITHUB_ENV
+          echo "desktop_appgroups_selected=\"\"" >> $GITHUB_ENV
           echo "package_list_board=\"vim-tiny\"" >> $GITHUB_ENV
         fi
     - name: Build
@@ -73,20 +73,7 @@ runs:
         sed -i "s|() {|() {\ndf -h \&\& du -sh \${SRC}/* \&\& du -sh \${SRC}/cache/* \&\& rm -rf \${SRC}/cache/sources/aptcache/* \${SRC}/cache/sources/linux-kernel-worktree/* \${SRC}/cache/sources/rootfs/*\n|g" extensions/image-output-abl.sh
         git status
         docker pull ghcr.io/armbian/docker-armbian-build:armbian-ubuntu-jammy-latest
-        if [ ${{ inputs.flavor }} == "server" ];then
-            ./compile.sh \
-            BOARD=${{ inputs.board }} \
-            BRANCH=${{ inputs.branch }} \
-            RELEASE=${{ env.release }} \
-            BUILD_MINIMAL=${{ env.build-minimal }} \
-            BUILD_DESKTOP=${{ env.build-desktop }} \
-            KERNEL_CONFIGURE=no \
-            EXPERT=${{ env.expert }} \
-            BOARD_FIRMWARE_INSTALL="-full" \
-            SHARE_LOG=yes \
-            DEBUG=yes \
-            COMPRESS_OUTPUTIMAGE=sha,gpg,xz
-        elif [ ${{ inputs.flavor }} == "desktop" ];then
+        if [ ${{ inputs.flavor }} == "desktop" ];then
             ./compile.sh \
             BOARD=${{ inputs.board }} \
             BRANCH=${{ inputs.branch }} \
@@ -98,6 +85,20 @@ runs:
             DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ env.desktop-environment-config-name }} \
             DESKTOP_APPGROUPS_SELECTED=${{ env.desktop_appgroups_selected }} \
             PACKAGE_LIST_BOARD=${{ env.package_list_board }} \
+            EXPERT=${{ env.expert }} \
+            BOARD_FIRMWARE_INSTALL="-full" \
+            SHARE_LOG=yes \
+            DEBUG=yes \
+            KERNEL_GIT=shallow \
+            COMPRESS_OUTPUTIMAGE=sha,gpg,xz
+        elif [ ${{ inputs.flavor }} == "server" ];then
+            ./compile.sh \
+            BOARD=${{ inputs.board }} \
+            BRANCH=${{ inputs.branch }} \
+            RELEASE=${{ env.release }} \
+            BUILD_MINIMAL=${{ env.build-minimal }} \
+            BUILD_DESKTOP=${{ env.build-desktop }} \
+            KERNEL_CONFIGURE=no \
             EXPERT=${{ env.expert }} \
             BOARD_FIRMWARE_INSTALL="-full" \
             SHARE_LOG=yes \
