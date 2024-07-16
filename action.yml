@@ -99,6 +99,7 @@ runs:
             BUILD_MINIMAL=${{ env.build-minimal }} \
             BUILD_DESKTOP=${{ env.build-desktop }} \
             KERNEL_CONFIGURE=no \
+            PACKAGE_LIST_BOARD=${{ env.package_list_board }} \
             EXPERT=${{ env.expert }} \
             BOARD_FIRMWARE_INSTALL="-full" \
             SHARE_LOG=yes \
