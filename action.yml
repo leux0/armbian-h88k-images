@@ -48,7 +48,7 @@ runs:
           echo "desktop-environment=no" >> $GITHUB_ENV
           echo "desktop-environment-config-name=config_base" >> $GITHUB_ENV
           echo "expert=no" >> $GITHUB_ENV
-          echo "desktop_appgroups_selected=\"\"" >> $GITHUB_ENV
+          echo "desktop_appgroups_selected=\"editors\"" >> $GITHUB_ENV
           echo "package_list_board=\"vim-tiny dnsmasq hostapd bridge-utils ifupdown iptables wireless-regdb\"" >> $GITHUB_ENV
         fi
     - name: Build
