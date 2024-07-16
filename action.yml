@@ -33,7 +33,7 @@ runs:
       shell: bash
       run: |
         if [ ${{ inputs.flavor }} == "desktop" ];then
-          echo "release=bookworm" >> $GITHUB_ENV
+          echo "release=jammy" >> $GITHUB_ENV
           echo "build-minimal=no" >> $GITHUB_ENV
           echo "build-desktop=yes" >> $GITHUB_ENV
           echo "desktop-environment=gnome" >> $GITHUB_ENV
