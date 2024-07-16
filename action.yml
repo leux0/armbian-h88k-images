@@ -33,7 +33,7 @@ runs:
       shell: bash
       run: |
         if [ ${{ inputs.flavor }} == "desktop" ];then
-          echo "release=jammy" >> $GITHUB_ENV
+          echo "release=bookworm" >> $GITHUB_ENV
           echo "build-minimal=no" >> $GITHUB_ENV
           echo "build-desktop=yes" >> $GITHUB_ENV
           echo "desktop-environment=gnome" >> $GITHUB_ENV
@@ -45,10 +45,7 @@ runs:
           echo "release=bookworm" >> $GITHUB_ENV
           echo "build-minimal=yes" >> $GITHUB_ENV
           echo "build-desktop=no" >> $GITHUB_ENV
-          echo "desktop-environment=no" >> $GITHUB_ENV
-          echo "desktop-environment-config-name=config_base" >> $GITHUB_ENV
           echo "expert=no" >> $GITHUB_ENV
-          echo "desktop_appgroups_selected=\"editors\"" >> $GITHUB_ENV
           echo "package_list_board=\"vim-tiny dnsmasq hostapd bridge-utils ifupdown iptables wireless-regdb\"" >> $GITHUB_ENV
         fi
     - name: Build
