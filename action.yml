@@ -69,7 +69,7 @@ runs:
         wget https://github.com/leux0/armbian-h88k-images/raw/main/panfork-mesa.packages -O config/desktop/jammy/appgroups/panfork-mesa/packages
         sed -i "s|() {|() {\ndf -h \&\& du -sh \${SRC}/* \&\& du -sh \${SRC}/cache/* \&\& rm -rf \${SRC}/cache/sources/aptcache/* \${SRC}/cache/sources/linux-kernel-worktree/* \${SRC}/cache/sources/rootfs/*\n|g" extensions/image-output-abl.sh
         git status
-        docker pull ghcr.io/armbian/docker-armbian-build:armbian-ubuntu-jammy-latest
+        # docker pull ghcr.io/armbian/docker-armbian-build:armbian-ubuntu-jammy-latest
         if [ ${{ inputs.flavor }} == "desktop" ];then
             ./compile.sh \
             BOARD=${{ inputs.board }} \
