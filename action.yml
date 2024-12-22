@@ -29,17 +29,6 @@ runs:
         repository: armbian/build
         ref: main
         path: build
-    - name: Set env
-      shell: bash
-      run: |
-        echo "release=noble" >> $GITHUB_ENV
-        echo "build-minimal=no" >> $GITHUB_ENV
-        echo "build-desktop=yes" >> $GITHUB_ENV
-        echo "desktop-environment=gnome" >> $GITHUB_ENV
-        echo "desktop-environment-config-name=config_base" >> $GITHUB_ENV
-        echo "expert=no" >> $GITHUB_ENV
-        echo "desktop_appgroups_selected=\"desktop_tools\"" >> $GITHUB_ENV
-        echo "package_list_board=\"vim-tiny\"" >> $GITHUB_ENV
     - name: Build
       shell: bash
       run: |
@@ -50,15 +39,15 @@ runs:
         ./compile.sh \
         BOARD=${{ inputs.board }} \
         BRANCH=${{ inputs.branch }} \
-        RELEASE=${{ env.release }} \
-        BUILD_MINIMAL=${{ env.build-minimal }} \
-        BUILD_DESKTOP=${{ env.build-desktop }} \
-        KERNEL_CONFIGURE=no \
-        DESKTOP_ENVIRONMENT=${{ env.desktop-environment }} \
-        DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ env.desktop-environment-config-name }} \
-        DESKTOP_APPGROUPS_SELECTED=${{ env.desktop_appgroups_selected }} \
-        PACKAGE_LIST_BOARD=${{ env.package_list_board }} \
-        EXPERT=${{ env.expert }} \
+        RELEASE=noble \
+        BUILD_MINIMAL=no \
+        BUILD_DESKTOP=yes \
+        KERNEL_CONFIGURE=prebuilt \
+        DESKTOP_ENVIRONMENT=gnome \
+        DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base \
+        DESKTOP_APPGROUPS_SELECTED="desktop_tools" \
+        PACKAGE_LIST_BOARD="vim-tiny" \
+        EXPERT=no \
         BOARD_FIRMWARE_INSTALL="-full" \
         ENABLE_EXTENSIONS=mesa-vpu \
         SHARE_LOG=yes \
