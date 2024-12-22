@@ -33,19 +33,13 @@ runs:
       shell: bash
       run: |
         if [ ${{ inputs.flavor }} == "desktop" ];then
-          echo "release=jammy" >> $GITHUB_ENV
+          echo "release=noble" >> $GITHUB_ENV
           echo "build-minimal=no" >> $GITHUB_ENV
           echo "build-desktop=yes" >> $GITHUB_ENV
           echo "desktop-environment=gnome" >> $GITHUB_ENV
           echo "desktop-environment-config-name=config_base" >> $GITHUB_ENV
           echo "expert=no" >> $GITHUB_ENV
-          echo "desktop_appgroups_selected=\"3dsupport rockchip-multimedia panfork-mesa\"" >> $GITHUB_ENV
-          echo "package_list_board=\"chromium vim-tiny\"" >> $GITHUB_ENV
-        elif [ ${{ inputs.flavor }} == "server" ];then
-          echo "release=bookworm" >> $GITHUB_ENV
-          echo "build-minimal=yes" >> $GITHUB_ENV
-          echo "build-desktop=no" >> $GITHUB_ENV
-          echo "expert=no" >> $GITHUB_ENV
+          echo "desktop_appgroups_selected=\"3dsupport\"" >> $GITHUB_ENV
           echo "package_list_board=\"vim-tiny\"" >> $GITHUB_ENV
         fi
     - name: Build
@@ -53,20 +47,6 @@ runs:
       run: |
         cd ./build
         touch .ignore_changes
-        sed -i "s|ext4|fat|g" config/boards/hinlink-h88k.csc
-        mkdir -p patch/kernel/rk35xx-legacy
-        wget https://github.com/leux0/armbian-h88k-images/raw/main/backport-v6.1.39.patch -O patch/kernel/rk35xx-legacy/055-backport-v6.1.39.patch
-        wget https://github.com/leux0/armbian-h88k-images/raw/main/linux-rk35xx-legacy.config -O config/kernel/linux-rk35xx-legacy.config
-        mkdir -p userpatches/overlay
-        wget https://github.com/leux0/armbian-h88k-images/raw/main/customize-image.sh -O userpatches/customize-image.sh
-        mkdir -p config/desktop/jammy/appgroups/rockchip-multimedia/sources/apt/
-        wget https://github.com/leux0/armbian-h88k-images/raw/main/liujianfeng1994.gpg -O config/desktop/jammy/appgroups/rockchip-multimedia/sources/apt/rockchip-multimedia.gpg
-        wget https://github.com/leux0/armbian-h88k-images/raw/main/rockchip-multimedia.source -O config/desktop/jammy/appgroups/rockchip-multimedia/sources/apt/rockchip-multimedia.source
-        wget https://github.com/leux0/armbian-h88k-images/raw/main/rockchip-multimedia.packages -O config/desktop/jammy/appgroups/rockchip-multimedia/packages
-        mkdir -p config/desktop/jammy/appgroups/panfork-mesa/sources/apt/
-        wget https://github.com/leux0/armbian-h88k-images/raw/main/liujianfeng1994.gpg -O config/desktop/jammy/appgroups/panfork-mesa/sources/apt/panfork-mesa.gpg
-        wget https://github.com/leux0/armbian-h88k-images/raw/main/panfork-mesa.source -O config/desktop/jammy/appgroups/panfork-mesa/sources/apt/panfork-mesa.source
-        wget https://github.com/leux0/armbian-h88k-images/raw/main/panfork-mesa.packages -O config/desktop/jammy/appgroups/panfork-mesa/packages
         sed -i "s|() {|() {\ndf -h \&\& du -sh \${SRC}/* \&\& du -sh \${SRC}/cache/* \&\& rm -rf \${SRC}/cache/sources/aptcache/* \${SRC}/cache/sources/linux-kernel-worktree/* \${SRC}/cache/sources/rootfs/*\n|g" extensions/image-output-abl.sh
         git status
         if [ ${{ inputs.flavor }} == "desktop" ];then
@@ -80,21 +60,6 @@ runs:
             DESKTOP_ENVIRONMENT=${{ env.desktop-environment }} \
             DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ env.desktop-environment-config-name }} \
             DESKTOP_APPGROUPS_SELECTED=${{ env.desktop_appgroups_selected }} \
-            PACKAGE_LIST_BOARD=${{ env.package_list_board }} \
-            EXPERT=${{ env.expert }} \
-            BOARD_FIRMWARE_INSTALL="-full" \
-            SHARE_LOG=yes \
-            DEBUG=yes \
-            KERNEL_GIT=shallow \
-            COMPRESS_OUTPUTIMAGE=sha,gpg,xz
-        elif [ ${{ inputs.flavor }} == "server" ];then
-            ./compile.sh \
-            BOARD=${{ inputs.board }} \
-            BRANCH=${{ inputs.branch }} \
-            RELEASE=${{ env.release }} \
-            BUILD_MINIMAL=${{ env.build-minimal }} \
-            BUILD_DESKTOP=${{ env.build-desktop }} \
-            KERNEL_CONFIGURE=no \
             PACKAGE_LIST_BOARD=${{ env.package_list_board }} \
             EXPERT=${{ env.expert }} \
             BOARD_FIRMWARE_INSTALL="-full" \
