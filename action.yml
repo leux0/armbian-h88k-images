@@ -38,7 +38,7 @@ runs:
         echo "desktop-environment=gnome" >> $GITHUB_ENV
         echo "desktop-environment-config-name=config_base" >> $GITHUB_ENV
         echo "expert=no" >> $GITHUB_ENV
-        echo "desktop_appgroups_selected=\"3dsupport\"" >> $GITHUB_ENV
+        echo "desktop_appgroups_selected=\"desktop_tools\"" >> $GITHUB_ENV
         echo "package_list_board=\"vim-tiny\"" >> $GITHUB_ENV
     - name: Build
       shell: bash
@@ -60,6 +60,7 @@ runs:
         PACKAGE_LIST_BOARD=${{ env.package_list_board }} \
         EXPERT=${{ env.expert }} \
         BOARD_FIRMWARE_INSTALL="-full" \
+        ENABLE_EXTENSIONS=mesa-vpu \
         SHARE_LOG=yes \
         DEBUG=yes \
         KERNEL_GIT=shallow \
