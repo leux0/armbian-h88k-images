@@ -32,16 +32,14 @@ runs:
     - name: Set env
       shell: bash
       run: |
-        if [ ${{ inputs.flavor }} == "desktop" ];then
-          echo "release=noble" >> $GITHUB_ENV
-          echo "build-minimal=no" >> $GITHUB_ENV
-          echo "build-desktop=yes" >> $GITHUB_ENV
-          echo "desktop-environment=gnome" >> $GITHUB_ENV
-          echo "desktop-environment-config-name=config_base" >> $GITHUB_ENV
-          echo "expert=no" >> $GITHUB_ENV
-          echo "desktop_appgroups_selected=\"3dsupport\"" >> $GITHUB_ENV
-          echo "package_list_board=\"vim-tiny\"" >> $GITHUB_ENV
-        fi
+        echo "release=noble" >> $GITHUB_ENV
+        echo "build-minimal=no" >> $GITHUB_ENV
+        echo "build-desktop=yes" >> $GITHUB_ENV
+        echo "desktop-environment=gnome" >> $GITHUB_ENV
+        echo "desktop-environment-config-name=config_base" >> $GITHUB_ENV
+        echo "expert=no" >> $GITHUB_ENV
+        echo "desktop_appgroups_selected=\"3dsupport\"" >> $GITHUB_ENV
+        echo "package_list_board=\"vim-tiny\"" >> $GITHUB_ENV
     - name: Build
       shell: bash
       run: |
@@ -49,25 +47,23 @@ runs:
         touch .ignore_changes
         sed -i "s|() {|() {\ndf -h \&\& du -sh \${SRC}/* \&\& du -sh \${SRC}/cache/* \&\& rm -rf \${SRC}/cache/sources/aptcache/* \${SRC}/cache/sources/linux-kernel-worktree/* \${SRC}/cache/sources/rootfs/*\n|g" extensions/image-output-abl.sh
         git status
-        if [ ${{ inputs.flavor }} == "desktop" ];then
-            ./compile.sh \
-            BOARD=${{ inputs.board }} \
-            BRANCH=${{ inputs.branch }} \
-            RELEASE=${{ env.release }} \
-            BUILD_MINIMAL=${{ env.build-minimal }} \
-            BUILD_DESKTOP=${{ env.build-desktop }} \
-            KERNEL_CONFIGURE=no \
-            DESKTOP_ENVIRONMENT=${{ env.desktop-environment }} \
-            DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ env.desktop-environment-config-name }} \
-            DESKTOP_APPGROUPS_SELECTED=${{ env.desktop_appgroups_selected }} \
-            PACKAGE_LIST_BOARD=${{ env.package_list_board }} \
-            EXPERT=${{ env.expert }} \
-            BOARD_FIRMWARE_INSTALL="-full" \
-            SHARE_LOG=yes \
-            DEBUG=yes \
-            KERNEL_GIT=shallow \
-            COMPRESS_OUTPUTIMAGE=sha,gpg,xz
-        fi
+        ./compile.sh \
+        BOARD=${{ inputs.board }} \
+        BRANCH=${{ inputs.branch }} \
+        RELEASE=${{ env.release }} \
+        BUILD_MINIMAL=${{ env.build-minimal }} \
+        BUILD_DESKTOP=${{ env.build-desktop }} \
+        KERNEL_CONFIGURE=no \
+        DESKTOP_ENVIRONMENT=${{ env.desktop-environment }} \
+        DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ env.desktop-environment-config-name }} \
+        DESKTOP_APPGROUPS_SELECTED=${{ env.desktop_appgroups_selected }} \
+        PACKAGE_LIST_BOARD=${{ env.package_list_board }} \
+        EXPERT=${{ env.expert }} \
+        BOARD_FIRMWARE_INSTALL="-full" \
+        SHARE_LOG=yes \
+        DEBUG=yes \
+        KERNEL_GIT=shallow \
+        COMPRESS_OUTPUTIMAGE=sha,gpg,xz
     - name: Upload
       if: inputs.release-id != '' && inputs.github-token != ''
       uses: xresloader/upload-to-github-release@v1
