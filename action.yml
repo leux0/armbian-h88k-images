@@ -45,7 +45,7 @@ runs:
         KERNEL_CONFIGURE=prebuilt \
         DESKTOP_ENVIRONMENT=gnome \
         DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base \
-        DESKTOP_APPGROUPS_SELECTED="desktop_tools" \
+        DESKTOP_APPGROUPS_SELECTED="" \
         PACKAGE_LIST_BOARD="vim-tiny" \
         EXPERT=no \
         BOARD_FIRMWARE_INSTALL="-full" \
